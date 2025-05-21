@@ -9,6 +9,8 @@ services:
       - elasticsearch
     environment:
       - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USER=${POSTGRES_USER}
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
       - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
     ports:
       - "8088:8088"
@@ -25,6 +27,8 @@ services:
       - elasticsearch
     environment:
       - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USER=${POSTGRES_USER}
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
       - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
     ports:
       - "8087:8087"
