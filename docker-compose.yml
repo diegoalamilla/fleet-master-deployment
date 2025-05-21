@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   fleet_master_main:
-    image: fleet-master_main_project:${BUILD_ID}
+    image: fleet-master_main_project:${FLEET_MAIN_BUILD_ID}
     container_name: fleet_master_main
     depends_on:
       - postgres
@@ -18,7 +18,7 @@ services:
       - fleet-network
 
   fleet_master_auth:
-    image: fleet-master_auth_project:${BUILD_ID}
+    image: fleet-master_auth_project:${FLEET_AUTH_BUILD_ID}
     container_name: fleet_master_auth
     depends_on:
       - postgres
