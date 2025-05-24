@@ -45,7 +45,7 @@ pipeline {
             
             if (serviceName) {
               echo "Actualizando solo el servicio: ${serviceName}"
-              sh "docker compose up -d ${serviceName}"
+              sh "docker compose up -d --force-recreate ${serviceName}"
             } else {
               echo "No se detectó un servicio específico. Haciendo compose up de todo."
               sh "docker compose up -d"
