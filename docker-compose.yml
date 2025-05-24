@@ -2,86 +2,52 @@ version: '3.8'
 
 services:
   fleet_master_main:
-    image: fleet-master_main_project:${FLEET_MAIN_BUILD_ID}
+    image: fleet_master_main_project:${FLEET_MAIN_BUILD_ID}
     container_name: fleet_master_main
     depends_on:
-      - postgres
-      - elasticsearch
+     - postgres
+   #   - elasticsearch
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_USER=${POSTGRES_USER}
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
+   #   - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
     ports:
       - "8088:8088"
-    volumes:
-      - logs-volume:/var/log/fleet-master
+    #volumes:
+    #  - logs-volume:/var/log/fleet-master
     networks:
       - fleet-network
 
   fleet_master_auth:
-    image: fleet-master_auth_project:${FLEET_AUTH_BUILD_ID}
+    image: fleet_master_auth_project:${FLEET_AUTH_BUILD_ID}
     container_name: fleet_master_auth
     depends_on:
       - postgres
-      - elasticsearch
+ #     - elasticsearch
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_USER=${POSTGRES_USER}
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
+  #    - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
     ports:
       - "8087:8087"
-    volumes:
-      - logs-volume:/var/log/fleet-auth
+   # volumes:
+    #  - logs-volume:/var/log/fleet-auth
     networks:
       - fleet-network
       
   postgres:
-    image: postgres:14
+    image: postgres:latest
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
     networks:
       - fleet-network
       
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-    ports:
-      - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    networks:
-      - fleet-network
-
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    volumes:
-      - grafana-data:/var/lib/grafana
-    depends_on:
-      - elasticsearch
-    networks:
-      - fleet-network
-
-volumes:
-  pgdata:
-  esdata:
-  grafana-data:
-  logs-volume:
-  
 networks:
   fleet-network:
     driver: bridge
