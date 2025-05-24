@@ -39,7 +39,9 @@ pipeline {
             echo "Contenedores en ejecución. Verificando qué servicio actualizar..."
             def commitMsg = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
             echo "Último commit: ${commitMsg}"
-            def serviceName = sh(script: "echo \"${commitMsg}\" | grep -oP '(?<=update )[^ ]+'", returnStdout: true).trim()
+            def serviceName = sh(script: "echo \"${commitMsg}\" | sed -n 's/.*update \\([^ ]*\\).*/\\1/p'",
+              returnStdout: true
+              ).trim()
             
             if (serviceName) {
               echo "Actualizando solo el servicio: ${serviceName}"
