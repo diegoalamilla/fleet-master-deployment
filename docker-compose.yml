@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  fleet_master_main:
+  fleet_master_main_project:
     image: fleet_master_main_project:${FLEET_MAIN_BUILD_ID}
     container_name: fleet_master_main
     depends_on:
@@ -19,7 +19,7 @@ services:
     networks:
       - fleet-network
 
-  fleet_master_auth:
+  fleet_master_auth_project:
     image: fleet_master_auth_project:${FLEET_AUTH_BUILD_ID}
     container_name: fleet_master_auth
     depends_on:
