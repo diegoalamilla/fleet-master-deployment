@@ -62,14 +62,14 @@ pipeline {
                  
                sh '''
             # Exponer fleet-main
-            ${ngrok} http 8088 > ngrok_fleet_main.log &
+            ngrok http 8088 > ngrok_fleet_main.log &
             sleep 5
             FLEET_MAIN_URL=$(grep -o 'url=https://[^ ]*' ngrok_fleet_main.log | head -n 1 | cut -d= -f2)
             echo "FLEET_MAIN_URL=$FLEET_MAIN_URL"
             echo "FLEET_MAIN_URL=$FLEET_MAIN_URL" >> .env
 
             # Exponer fleet-auth
-            ${ngrok} http 8087 > ngrok_fleet_auth.log &
+            ngrok http 8087 > ngrok_fleet_auth.log &
             sleep 5
             FLEET_AUTH_URL=$(grep -o 'url=https://[^ ]*' ngrok_fleet_auth.log | head -n 1 | cut -d= -f2)
             echo "FLEET_AUTH_URL=$FLEET_AUTH_URL"
