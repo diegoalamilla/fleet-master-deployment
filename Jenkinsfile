@@ -56,29 +56,24 @@ pipeline {
     }
     stage ('Get Public Url'){
         steps{
-            script{
+            script{  
+              sh '''
+              
+              ngrok start --all
 
-                def ngrok = 'C:\\ngrok\\ngrok.exe'
-                 
-               sh '''
-            # Exponer fleet-main
-            ngrok http 8088 > ngrok_fleet_main.log &
-            sleep 5
-            FLEET_MAIN_URL=$(grep -o 'url=https://[^ ]*' ngrok_fleet_main.log | head -n 1 | cut -d= -f2)
-            echo "FLEET_MAIN_URL=$FLEET_MAIN_URL"
-            echo "FLEET_MAIN_URL=$FLEET_MAIN_URL" >> .env
+              sleep 5
 
-            # Exponer fleet-auth
-            ngrok http 8087 > ngrok_fleet_auth.log &
-            sleep 5
-            FLEET_AUTH_URL=$(grep -o 'url=https://[^ ]*' ngrok_fleet_auth.log | head -n 1 | cut -d= -f2)
-            echo "FLEET_AUTH_URL=$FLEET_AUTH_URL"
-            echo "FLEET_AUTH_URL=$FLEET_AUTH_URL" >> .env
+              NGROK_TUNNELS=$(curl -s http://localhost:4040/api/tunnels)
 
-            # Confirmar URLs finales
-            echo "URLs públicas disponibles:"
-            cat .env
-          '''
+              # fleet-master-main
+              FLEET_MAIN_URL=$(echo "$NGROK_TUNNELS" | sed -n 's/.*"name":"fleet-master-main"[^}]*"public_url":"\([^"]*\)".*/\1/p')
+
+              # fleet-master-auth
+              FLEET_AUTH_URL=$(echo "$NGROK_TUNNELS" | sed -n 's/.*"name":"fleet-master-auth"[^}]*"public_url":"\([^"]*\)".*/\1/p')
+
+              echo " Fleet Master Main público: $FLEET_MAIN_URL"
+              echo " Fleet Master Auth público: $FLEET_AUTH_URL"
+              '''
             }
         }
     }
