@@ -60,8 +60,6 @@ pipeline {
              sh """
                 ngrok start --all
 
-                sleep 5
-
                 NGROK_TUNNELS=\$(curl -s http://localhost:4040/api/tunnels)
 
                 # fleet-master-main
