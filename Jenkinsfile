@@ -58,7 +58,9 @@ pipeline {
         steps{
             script{  
              sh """
-                ngrok start --all
+                ngrok start --all > /dev/null 2>&1 &
+
+                sleep 5
 
                 NGROK_TUNNELS=\$(curl -s http://localhost:4040/api/tunnels)
 
