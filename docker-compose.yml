@@ -66,6 +66,7 @@ services:
       - elasticsearch
     networks:
       - fleet-network
+    command: ["-strict.perms=false"]
 
   grafana:
     image: grafana/grafana-oss
