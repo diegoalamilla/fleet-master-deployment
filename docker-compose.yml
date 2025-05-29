@@ -61,7 +61,7 @@ services:
     user: root
     volumes:
       - logs-volume:/app/logs
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
     depends_on:
       - elasticsearch
     networks:
