@@ -5,17 +5,15 @@ services:
     image: fleet_master_main_project:${FLEET_MAIN_BUILD_ID}
     container_name: fleet_master_main
     depends_on:
-     - postgres
-   #   - elasticsearch
+      - postgres
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_USER=${POSTGRES_USER}
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-   #   - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
     ports:
       - "8088:8088"
-    #volumes:
-    #  - logs-volume:/var/log/fleet-master
+    volumes:
+      - logs-volume:/app/logs
     networks:
       - fleet-network
 
@@ -24,16 +22,14 @@ services:
     container_name: fleet_master_auth
     depends_on:
       - postgres
- #     - elasticsearch
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_USER=${POSTGRES_USER}
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-  #    - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
     ports:
       - "8087:8087"
-   # volumes:
-    #  - logs-volume:/var/log/fleet-auth
+    volumes:
+      - logs-volume:/app/logs
     networks:
       - fleet-network
       
@@ -47,7 +43,43 @@ services:
       - "5432:5432"
     networks:
       - fleet-network
-      
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false  #Simple tests
+    ports:
+      - "9200:9200"
+    networks:
+      - fleet-network
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.13.0
+    container_name: filebeat
+    user: root
+    volumes:
+      - logs-volume:/app/logs
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      - fleet-network
+    command: ["-strict.perms=false"]
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - fleet-network
+
+volumes:
+  pgdata:
+  logs-volume:
+  
 networks:
   fleet-network:
     driver: bridge

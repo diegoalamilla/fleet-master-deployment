@@ -28,6 +28,12 @@ pipeline {
       }
     }
 
+    stage('Fix permissions for filebeat.yml') {
+    steps {
+        sh 'chmod go-w filebeat.yml'
+        }
+    }
+
     stage('Deploy') {
       steps {
         script {
