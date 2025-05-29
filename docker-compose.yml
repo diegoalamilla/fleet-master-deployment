@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  fleet_master_main:
-    image: fleet-master_main_project:${FLEET_MAIN_BUILD_ID}
+  fleet_master_main_project:
+    image: fleet_master_main_project:${FLEET_MAIN_BUILD_ID}
     container_name: fleet_master_main
     depends_on:
       - postgres
@@ -13,12 +13,12 @@ services:
     ports:
       - "8088:8088"
     volumes:
-      - logs_volume:/app/logs
+      - logs-volume:/app/logs
     networks:
       - fleet-network
 
-  fleet_master_auth:
-    image: fleet-master_auth_project:${FLEET_AUTH_BUILD_ID}
+  fleet_master_auth_project:
+    image: fleet_master_auth_project:${FLEET_AUTH_BUILD_ID}
     container_name: fleet_master_auth
     depends_on:
       - postgres
@@ -29,20 +29,18 @@ services:
     ports:
       - "8087:8087"
     volumes:
-      - logs_volume:/app/logs
+      - logs-volume:/app/logs
     networks:
       - fleet-network
       
   postgres:
-    image: postgres:14
+    image: postgres:latest
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
     networks:
       - fleet-network
 
@@ -55,19 +53,19 @@ services:
     ports:
       - "9200:9200"
     networks:
-      - fleet_network
+      - fleet-network
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.13.0
     container_name: filebeat
     user: root
     volumes:
-      - logs_volume:/app/logs
+      - logs-volume:/app/logs
       - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
     depends_on:
       - elasticsearch
     networks:
-      - fleet_network
+      - fleet-network
 
   grafana:
     image: grafana/grafana-oss
@@ -75,7 +73,7 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - fleet_network
+      - fleet-network
 
 volumes:
   pgdata:
