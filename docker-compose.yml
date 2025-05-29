@@ -6,16 +6,14 @@ services:
     container_name: fleet_master_main
     depends_on:
       - postgres
-      - elasticsearch
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_USER=${POSTGRES_USER}
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
     ports:
       - "8088:8088"
     volumes:
-      - logs-volume:/var/log/fleet-master
+      - logs_volume:/app/logs
     networks:
       - fleet-network
 
@@ -24,16 +22,14 @@ services:
     container_name: fleet_master_auth
     depends_on:
       - postgres
-      - elasticsearch
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_USER=${POSTGRES_USER}
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - LOGGING_ELASTICSEARCH_URL=${LOGGING_ELASTICSEARCH_URL}
     ports:
       - "8087:8087"
     volumes:
-      - logs-volume:/var/log/fleet-auth
+      - logs_volume:/app/logs
     networks:
       - fleet-network
       
@@ -49,37 +45,40 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - fleet-network
-      
+
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - xpack.security.enabled=false  #Simple tests
     ports:
       - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
     networks:
-      - fleet-network
+      - fleet_network
 
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.13.0
+    container_name: filebeat
+    user: root
     volumes:
-      - grafana-data:/var/lib/grafana
+      - logs_volume:/app/logs
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
     depends_on:
       - elasticsearch
     networks:
-      - fleet-network
+      - fleet_network
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - fleet_network
 
 volumes:
   pgdata:
-  esdata:
-  grafana-data:
   logs-volume:
   
 networks:
